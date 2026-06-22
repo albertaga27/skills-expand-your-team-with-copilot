@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryFilters = document.querySelectorAll(".category-filter");
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
+  const difficultyFilters = document.querySelectorAll(".difficulty-filter");
 
   // Authentication elements
   const loginButton = document.getElementById("login-button");
@@ -40,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let currentDifficultyFilter = "";
 
   // Authentication state
   let currentUser = null;
@@ -451,6 +453,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Apply difficulty filter (empty string means "All" - no filter applied)
+      if (currentDifficultyFilter !== "") {
+        // Activities with no difficulty are open to all levels
+        if (details.difficulty && details.difficulty !== currentDifficultyFilter) {
+          return;
+        }
+      }
+
       // Activity passed all filters, add to filtered list
       filteredActivities[name] = details;
     });
@@ -638,6 +648,20 @@ document.addEventListener("DOMContentLoaded", () => {
       // Update current time filter and fetch activities
       currentTimeRange = button.dataset.time;
       fetchActivities();
+    });
+  });
+
+  // Add event listeners for difficulty filter buttons
+  difficultyFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      // Update active class
+      difficultyFilters.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      // Update current difficulty filter and display filtered activities
+      // Empty string means "All" (no difficulty filter applied)
+      currentDifficultyFilter = button.dataset.difficulty;
+      displayFilteredActivities();
     });
   });
 
