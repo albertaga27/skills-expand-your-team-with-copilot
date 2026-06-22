@@ -571,7 +571,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="share-buttons">
         <span class="share-label">Share:</span>
-        <button class="share-button share-twitter" title="Share on X (Twitter)" aria-label="Share on X (Twitter)">𝕏</button>
+        <button class="share-button share-twitter" title="Share on X" aria-label="Share on X">𝕏</button>
         <button class="share-button share-copy" title="Copy link" aria-label="Copy link to clipboard">🔗</button>
         ${navigator.share ? `<button class="share-button share-native" title="Share" aria-label="Share this activity">⬆️</button>` : ""}
       </div>
@@ -622,11 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = window.location.href;
 
     if (platform === "twitter") {
-      const tweetUrl =
-        "https://twitter.com/intent/tweet?text=" +
-        encodeURIComponent(text) +
-        "&url=" +
-        encodeURIComponent(url);
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
       window.open(tweetUrl, "_blank", "noopener,noreferrer");
     } else if (platform === "copy") {
       try {
