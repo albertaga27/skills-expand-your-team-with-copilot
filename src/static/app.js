@@ -569,6 +569,12 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button class="share-button share-twitter" title="Share on X (Twitter)" aria-label="Share on X (Twitter)">𝕏</button>
+        <button class="share-button share-copy" title="Copy link" aria-label="Copy link to clipboard">🔗</button>
+        ${navigator.share ? `<button class="share-button share-native" title="Share" aria-label="Share this activity">⬆️</button>` : ""}
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -587,7 +593,60 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handlers for share buttons
+    activityCard.querySelector(".share-twitter").addEventListener("click", () => {
+      shareActivity("twitter", name, details);
+    });
+    activityCard.querySelector(".share-copy").addEventListener("click", (e) => {
+      shareActivity("copy", name, details, e.currentTarget);
+    });
+    const nativeBtn = activityCard.querySelector(".share-native");
+    if (nativeBtn) {
+      nativeBtn.addEventListener("click", () => {
+        shareActivity("native", name, details);
+      });
+    }
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Build a share message for an activity
+  function buildShareText(name, details) {
+    const schedule = formatSchedule(details);
+    return `Check out "${name}" at Mergington High School! Schedule: ${schedule}`;
+  }
+
+  // Share an activity via the chosen platform
+  async function shareActivity(platform, name, details, buttonEl) {
+    const text = buildShareText(name, details);
+    const url = window.location.href;
+
+    if (platform === "twitter") {
+      const tweetUrl =
+        "https://twitter.com/intent/tweet?text=" +
+        encodeURIComponent(text) +
+        "&url=" +
+        encodeURIComponent(url);
+      window.open(tweetUrl, "_blank", "noopener,noreferrer");
+    } else if (platform === "copy") {
+      try {
+        await navigator.clipboard.writeText(text + " " + url);
+        // Briefly show feedback on the button
+        const original = buttonEl.textContent;
+        buttonEl.textContent = "✅";
+        setTimeout(() => {
+          buttonEl.textContent = original;
+        }, 1500);
+      } catch {
+        showMessage("Could not copy to clipboard.", "error");
+      }
+    } else if (platform === "native") {
+      try {
+        await navigator.share({ title: name, text, url });
+      } catch {
+        // User cancelled or API unsupported — do nothing
+      }
+    }
   }
 
   // Event listeners for search and filter
